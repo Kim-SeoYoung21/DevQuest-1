@@ -19,6 +19,10 @@ public class EnemySpawner : MonoBehaviour
     {
         currentMonsterInstance = Instantiate(monsterPrefab, transform.position, transform.rotation);
         Enemy enemy = currentMonsterInstance.GetComponent<Enemy>();
+        if (enemy != null)
+        {
+            enemy.SetSpawner(this);
+        }
     }
 
     public void NotifyEnemyDeath()

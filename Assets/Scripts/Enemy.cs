@@ -23,6 +23,7 @@ public class Enemy : MonoBehaviour
 
     private float wanderWaitTimer = -1f;
     private EnemySpawner mySpawner;
+    private Health health;
 
     public enum State
     {
@@ -48,6 +49,12 @@ public class Enemy : MonoBehaviour
         if (target == null)
         {
             target = GameObject.FindGameObjectWithTag("Player")?.transform;
+        }
+
+        health = GetComponent<Health>();
+        if (health != null)
+        {
+            health.OnDied += Die;
         }
     }
 
@@ -170,20 +177,18 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    /*
-    private void GoNextWaypoint()
-    {
-        if ((waypoints.Length == 0))
-        {
-            return;
-        }
-        nmAgent.SetDestination(waypoints[currentWaypointIndex].position);
-        currentWaypointIndex = (currentWaypointIndex + 1) % waypoints.Length;
-    }
-    */
     private void Attack() //현재 공격은 애니메이션만 작동합니다.
     {
         animator.SetTrigger("attack");
+
+        if (target == null) return;
+
+        float distance = Vector3.Distance(transform.position, target.position);
+
+        if(distance <= attackRange)
+        {
+            target.GetComponent<Health>()?.TakeDamage(10f);
+        }
     }
 
     public void InstantiateFx() //Unity Animation Event 에서 실행됩니다.
@@ -205,6 +210,10 @@ public class Enemy : MonoBehaviour
         Destroy(gameObject);
     }
 
+    public void SetSpawner(EnemySpawner spawner)
+    {
+        mySpawner = spawner;
+    }
 
     private void OnDrawGizmosSelected()
     {
